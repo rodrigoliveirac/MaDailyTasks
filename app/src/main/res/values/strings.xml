@@ -1,0 +1,29 @@
+<resources>
+  <string name="app_name">Tasks</string>
+  <string name="title_activity_main">My Tasks</string>
+  <string name="title_task_list">Task List</string>
+  <string name="title_task_form">Create a task</string>
+
+  <string name="task_name">Task Name</string>
+  <string name="task_complete">The Task was completed?</string>
+
+  <string name="mon">Segunda</string>
+  <string name="tue">Terça</string>
+  <string name="wed">Quarta</string>
+  <string name="thu">Quinta</string>
+  <string name="fri">Sexta</string>
+  <string name="sat">Sábado</string>
+  <string name="sun">Domingo</string>
+
+  <!-- Content Descriptions and Accessibility Text -->
+  <string name="accessibility_add">Add Task</string>
+  <string name="save">To salve</string>
+
+  <string-array name="tags">
+    <item>WORKOUT</item>
+    <item>STUDY</item>
+    <item>WORK</item>
+    <item>CODE</item>
+  </string-array>
+
+</resources>

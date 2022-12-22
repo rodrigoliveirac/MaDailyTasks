@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/nav_graph"
+  app:startDestination="@id/taskListFragment">
+
+  <fragment
+    android:id="@+id/taskListFragment"
+    android:name="com.rodrigo.dailytasks.collections.TaskListFragment"
+    android:label="@string/title_task_list"
+    tools:layout="@layout/fragment_task_list">
+
+    <action
+      android:id="@+id/action_taskList_to_taskForm"
+      app:destination="@id/taskFormFragment" />
+  </fragment>
+
+  <fragment
+    android:id="@+id/taskFormFragment"
+    android:name="com.rodrigo.dailytasks.form.TaskFormFragment"
+    android:label="@string/title_task_form" />
+
+</navigation>
