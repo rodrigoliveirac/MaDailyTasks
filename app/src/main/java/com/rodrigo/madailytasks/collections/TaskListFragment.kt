@@ -55,6 +55,10 @@ class TaskListFragment : Fragment() {
       bindUiState(it)
     }
 
+    viewModel.stateOnceAndStreamTimer().observe(viewLifecycleOwner) {
+      binding.taskTimer.text = it.timeLeftFormatted.toString()
+    }
+
     // Set Navigation Fab
     binding.fab.setOnClickListener {
       findNavController().navigate(R.id.action_taskList_to_taskForm)

@@ -1,5 +1,6 @@
 package com.rodrigo.madailytasks.dummy
 
+import android.os.CountDownTimer
 import com.rodrigo.madailytasks.collections.Tag
 import com.rodrigo.madailytasks.collections.TaskItem
 import com.rodrigo.madailytasks.collections.TimeTask
@@ -15,6 +16,12 @@ object MockTasks : TasksRepository {
 
     override fun fetchTasks() = taskItemList.map { it.copy() }
 
+    override fun getTask(taskId: String): TaskItem {
+        val taskIndex = findTaskIndexById(taskId)
+        val task = taskItemList[taskIndex]
+        return task.copy(task = task.task, subtask = task.subtask, project = task.project, tag = Tag.valueOf(task.tag.name), timeTask = task.timeTask)
+    }
+
     override fun addTask(
         task: String,
         subTask: String,
@@ -29,16 +36,16 @@ object MockTasks : TasksRepository {
                 subtask = subTask,
                 tag = Tag.valueOf(tag),
                 project = project,
-                time = time,
-                isDone = false
+                timeTask = time,
+                isDone = false,
             )
         )
     }
 
-    override fun toggleTaskFinished(id: String) {
+    override fun toggleTaskIsRunning(id: String) {
         val taskIndex = findTaskIndexById(id)
         val task = taskItemList[taskIndex]
-        taskItemList[taskIndex] = task.copy(isDone = !task.isDone)
+        taskItemList[taskIndex] = task.copy(isRunning = !task.isRunning)
     }
 
     private fun findTaskIndexById(id: String) = taskItemList.indexOfFirst { taskItem ->

@@ -1,5 +1,6 @@
 package com.rodrigo.madailytasks.collections
 
+import android.os.CountDownTimer
 import com.rodrigo.madailytasks.R
 
 /**
@@ -9,20 +10,31 @@ import com.rodrigo.madailytasks.R
  * @param isDone whether the task is checked or not
  */
 data class TaskItem(
-    val id: String,
-    val task: String,
+    var id: String,
+    var task: String,
     val subtask: String,
     val project: String,
     val tag: Tag,
-    val time: TimeTask,
+    val timeTask: TimeTask,
+    var countDownTimer: CountDownTimer? = null,
+    var isRunning: Boolean = false,
     val isDone: Boolean  = false //TODO("to do review of logic structure")
+)
+
+data class CurrentTask(
+    var taskId: TaskItem
 )
 
 data class TimeTask(
     val hours: String,
     val minutes: String,
-    val seconds: String
+    val seconds: String,
 )
+
+enum class RunningState() {
+     PAUSED,
+     STARTED
+}
 
 enum class Tag(val tag: Int) {
 
@@ -33,11 +45,3 @@ enum class Tag(val tag: Int) {
 
 
 }
-
-/*
-    Hours =
-    Seconds = Milliseconds / 1000
-    Minutes = Seconds / 60
-     or
-     Minutes = (Milliseconds / 1000) / 60
- */

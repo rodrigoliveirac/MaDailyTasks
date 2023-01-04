@@ -4,7 +4,8 @@
   <string name="title_task_list">Task List</string>
   <string name="title_task_form">Create a task</string>
 
-  <string name="task_name">Task Name</string>
+  <string name="task_name">Task</string>
+  <string name="subtask_name">Task</string>
   <string name="task_complete">The Task was completed?</string>
 
   <string name="mon">Segunda</string>

@@ -19,7 +19,7 @@
             android:layout_marginStart="@dimen/horizontal_margin"
             android:layout_marginTop="@dimen/vertical_margin"
             android:layout_marginEnd="@dimen/horizontal_margin"
-            android:hint="@string/habit_title"
+            android:hint="@string/task_name"
             app:endIconMode="clear_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +43,7 @@
             android:layout_marginStart="@dimen/horizontal_margin"
             android:layout_marginTop="@dimen/vertical_margin"
             android:layout_marginEnd="@dimen/horizontal_margin"
-            android:hint="SubTask Name"
+            android:hint="@string/subtask_name"
             app:endIconMode="clear_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +68,7 @@
             android:layout_marginStart="@dimen/horizontal_margin"
             android:layout_marginTop="@dimen/vertical_margin"
             android:layout_marginEnd="@dimen/horizontal_margin"
-            android:hint="Date"
+            android:hint="Project"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subtaskNameTextInput"
@@ -86,7 +86,7 @@
             </com.google.android.material.textfield.TextInputEditText>
 
         </com.google.android.material.textfield.TextInputLayout>
-        <!-- Habit Priority -->
+        <!-- Task Tag -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tagNameTextInput"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
@@ -104,16 +104,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:hint="Select the priority"
+                android:hint="Chose a tag"
                 android:inputType="none"
-                android:text="MEDIUM"
+                android:text="WORKOUT"
                 tools:ignore="HardcodedText,LabelFor" />
 
         </com.google.android.material.textfield.TextInputLayout>
-        <!-- Habit Days Selected -->
 
-
-        <!-- Save Habit Button -->
+        <!-- Save Task Button -->
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/saveButton"

@@ -7,7 +7,9 @@ interface TasksRepository {
 
     fun fetchTasks(): List<TaskItem>
 
-    fun toggleTaskFinished(id: String)
+    fun getTask(taskId: String): TaskItem
+
+    fun toggleTaskIsRunning(id: String)
 
     fun addTask(
         task: String,

@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rodrigo.madailytasks.R
 import com.rodrigo.madailytasks.databinding.TaskItemBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -19,21 +21,24 @@ import java.util.concurrent.TimeUnit
  * We use the [TaskItem] as a model for the binding.
  */
 class TaskListAdapter(
-    private val viewModel: TaskListViewModel
+    private val viewModel: TaskListViewModel,
 ) : RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
     private val asyncListDiffer: AsyncListDiffer<TaskItem> = AsyncListDiffer(this, DiffCallback)
-
+    private var lastSelectedPosition = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = TaskItemBinding.inflate(layoutInflater, parent, false)
-        return ViewHolder(binding, viewModel)
+        return ViewHolder(viewModel = viewModel, binding = binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+
         holder.bind(asyncListDiffer.currentList[position])
+//        lastSelectedPosition = holder.adapterPosition
+//        holder.bind(asyncListDiffer.currentList[lastSelectedPosition])
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
@@ -42,10 +47,12 @@ class TaskListAdapter(
         asyncListDiffer.submitList(tasks)
     }
 
+
     class ViewHolder(
         private val binding: TaskItemBinding,
-        private val viewModel: TaskListViewModel
-    ) : RecyclerView.ViewHolder(binding.root) {
+        private val viewModel: TaskListViewModel,
+
+        ) : RecyclerView.ViewHolder(binding.root) {
 
         private var isRunning: Boolean = false;
         var isDone: Boolean = false;
@@ -53,9 +60,7 @@ class TaskListAdapter(
 
         var timeInMs = 0L
 
-
         fun bind(task: TaskItem) {
-
             setValueTimeInMsByTask(task)
 
             binding.taskNameTextView.text = task.task
@@ -66,7 +71,7 @@ class TaskListAdapter(
             updateCountDownText()
 
             binding.btnStart.setOnClickListener {
-                //viewModel.clickStartCountTimer(task.id)
+
                 if (isRunning) {
                     pauseTimer()
                 } else {
@@ -74,23 +79,25 @@ class TaskListAdapter(
                 }
             }
 
-
         }
 
         private fun setValueTimeInMsByTask(task: TaskItem) {
-            val hours = task.time.hours.toLong() * 3600000L
-            val min = task.time.minutes.toLong() * 60000L
-            val sec = task.time.seconds.toLong() * 1000L
+            val hours = task.timeTask.hours.toLong() * 3600000L
+            val min = task.timeTask.minutes.toLong() * 60000L
+            val sec = task.timeTask.seconds.toLong() * 1000L
 
             val total = hours + min + sec
+
             timeInMs = total
+
+
         }
 
         private fun startTimer() {
 
             countdownTimer = object : CountDownTimer(timeInMs, 1000) {
                 override fun onFinish() {
-                    isDone = true
+
                 }
 
                 override fun onTick(p0: Long) {
@@ -100,6 +107,7 @@ class TaskListAdapter(
             }.start()
 
             isRunning = true
+
             binding.btnStart.setImageResource(R.drawable.ic_pause)
 
         }
@@ -109,22 +117,27 @@ class TaskListAdapter(
             val minute = (timeInMs / 1000 / 60) % 60
             val seconds = (timeInMs / 1000) % 60
 
-            val timeLeftFormatted: String =
-                java.lang.String.format(
-                    Locale.getDefault(),
-                    "%02d:%02d:%02d",
-                    hour,
-                    minute,
-                    seconds
-                )
+            val timeLeftFormatted = java.lang.String.format(
+                Locale.getDefault(),
+                "%02d:%02d:%02d",
+                hour,
+                minute,
+                seconds
+            )
+
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.clickStartCountTimer(timeLeftFormatted)
+            }
 
             binding.timeTextView.text = timeLeftFormatted
         }
 
         private fun pauseTimer() {
-            binding.btnStart.setImageResource(R.drawable.ic_play)
-            countdownTimer.cancel()
-            isRunning = false
+            CoroutineScope(Dispatchers.Default).launch {
+                binding.btnStart.setImageResource(R.drawable.ic_play)
+                countdownTimer.cancel()
+                isRunning = false
+            }
         }
     }
 
@@ -139,21 +152,4 @@ class TaskListAdapter(
             return oldItem.isDone == newItem.isDone
         }
     }
-}
-
-object Utility {
-
-    //time to countdown - 1hr - 60secs
-    const val TIME_COUNTDOWN: Long = 60000L
-    private const val TIME_FORMAT = "%02d:%02d:%02d"
-
-
-    //convert time to milli seconds
-    fun Long.formatTime(): String = String.format(
-        TIME_FORMAT,
-        TimeUnit.MILLISECONDS.toHours(this),
-        TimeUnit.MILLISECONDS.toMinutes(this) % 3600,
-        TimeUnit.MILLISECONDS.toSeconds(this) % 60
-    )
-
 }
