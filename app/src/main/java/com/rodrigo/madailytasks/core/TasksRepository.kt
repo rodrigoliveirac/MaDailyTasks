@@ -1,21 +1,17 @@
 package com.rodrigo.madailytasks.core
 
 import com.rodrigo.madailytasks.collections.TaskItem
-import com.rodrigo.madailytasks.collections.TimeTask
+import kotlinx.coroutines.flow.Flow
 
 interface TasksRepository {
 
-    fun fetchTasks(): List<TaskItem>
-
-    fun getTask(taskId: String): TaskItem
-
-    fun toggleTaskIsRunning(id: String)
-
+    suspend fun fetchTasks(): Flow<List<TaskItem>>
+    fun timerTest(id:String, position: Int)
     fun addTask(
         task: String,
         subTask: String,
         tag: String,
         project: String,
-        time: TimeTask
+        time: Long
     )
 }

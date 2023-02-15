@@ -3,8 +3,9 @@ package com.rodrigo.madailytasks.dummy
 import android.os.CountDownTimer
 import com.rodrigo.madailytasks.collections.Tag
 import com.rodrigo.madailytasks.collections.TaskItem
-import com.rodrigo.madailytasks.collections.TimeTask
 import com.rodrigo.madailytasks.core.TasksRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
 /**
@@ -12,22 +13,25 @@ import java.util.*
  */
 object MockTasks : TasksRepository {
 
-    private val taskItemList: MutableList<TaskItem> = mutableListOf()
+    private var taskItemList: MutableList<TaskItem> = mutableListOf()
 
-    override fun fetchTasks() = taskItemList.map { it.copy() }
+    private var taskItemListFlow = MutableStateFlow(taskItemList.map { it.copy() })
 
-    override fun getTask(taskId: String): TaskItem {
-        val taskIndex = findTaskIndexById(taskId)
-        val task = taskItemList[taskIndex]
-        return task.copy(task = task.task, subtask = task.subtask, project = task.project, tag = Tag.valueOf(task.tag.name), timeTask = task.timeTask)
-    }
+
+    private val runningTimers = HashMap<Int, CountDownTimer>()
+
+    private var currentRunningTask = -1
+
+    override suspend fun fetchTasks(): Flow<List<TaskItem>> =
+        taskItemListFlow
+
 
     override fun addTask(
         task: String,
         subTask: String,
         tag: String,
         project: String,
-        time: TimeTask
+        time: Long
     ) {
         taskItemList.add(
             TaskItem(
@@ -37,18 +41,86 @@ object MockTasks : TasksRepository {
                 tag = Tag.valueOf(tag),
                 project = project,
                 timeTask = time,
-                isDone = false,
+                isRunning = false,
+                timeLeft = 0L,
             )
         )
+        taskItemListFlow.value = taskItemList
     }
 
-    override fun toggleTaskIsRunning(id: String) {
-        val taskIndex = findTaskIndexById(id)
+    override fun timerTest(id: String, position: Int) {
+
+        isRunningOrNot(id)
+
+        val taskIndex = findHabitIndexById(id)
         val task = taskItemList[taskIndex]
-        taskItemList[taskIndex] = task.copy(isRunning = !task.isRunning)
+
+        runningTimers.values.forEach { it.cancel() }
+
+        val currentTimer = runningTimers[position]
+
+        setupTimer(currentTimer, position, task)
+
     }
 
-    private fun findTaskIndexById(id: String) = taskItemList.indexOfFirst { taskItem ->
+    private fun isRunningOrNot(id: String) {
+        taskItemList = taskItemList.map {
+            if (id == it.id) {
+                it.copy(isRunning = !it.isRunning)
+            } else {
+                it.copy(isRunning = false)
+
+            }
+        } as MutableList<TaskItem>
+        taskItemListFlow.value = taskItemList
+    }
+
+    private fun setupTimer(
+        currentTimer: CountDownTimer?,
+        position: Int,
+        task: TaskItem,
+    ) {
+
+        if (currentTimer != null && position == currentRunningTask) {
+            if (currentRunningTask != -1) {
+                currentRunningTask = -1
+                currentTimer.cancel()
+            }
+        } else {
+            startTimer(task, position)
+        }
+    }
+
+    private fun startTimer(task: TaskItem, position: Int) {
+
+        val index = findHabitIndexById(task.id)
+        val taskItem = taskItemList[index]
+
+        val timer = object : CountDownTimer(taskItem.timeTask, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+
+                taskItemList = taskItemList.map {
+                    if (task.id == it.id) {
+                        it.copy(timeTask = millisUntilFinished)
+                    } else {
+                        it.copy()
+                    }
+                } as MutableList<TaskItem>
+
+                taskItemListFlow.value = taskItemList
+            }
+
+            override fun onFinish() {
+                taskItemList[position] = task.copy(timeTask = 0L)
+            }
+        }
+        runningTimers[position] = timer
+        timer.start()
+        currentRunningTask = position
+    }
+
+    private fun findHabitIndexById(id: String) = taskItemList.indexOfFirst { taskItem ->
         taskItem.id == id
     }
 }

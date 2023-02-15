@@ -1,4 +1,4 @@
-package com.rodrigo.dailytasks.form
+package com.rodrigo.madailytasks.form
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.rodrigo.madailytasks.R
 import com.rodrigo.madailytasks.collections.TaskListViewModel
-import com.rodrigo.madailytasks.collections.TimeTask
 import com.rodrigo.madailytasks.databinding.FragmentTaskFormBinding
 import com.rodrigo.madailytasks.dummy.MockTasks
 
@@ -61,10 +60,11 @@ class TaskFormFragment : Fragment() {
 
         val projectName = binding.projectNameTextInput.editText?.text.toString()
 
-        val hours = binding.hoursTextInput.editText?.text.toString()
-        val minutes = binding.minutesTextInput.editText?.text.toString()
-        val seconds = binding.secondsTextInput.editText?.text.toString()
-        val timeTask = TimeTask(hours, minutes, seconds)
+        val hours = binding.hoursTextInput.editText?.text.toString().toLong() * 3600000L
+        val minutes = binding.minutesTextInput.editText?.text.toString().toLong() * 60000L
+        val seconds = binding.secondsTextInput.editText?.text.toString().toLong() * 1000L
+
+        val timeTask = hours + minutes + seconds
 
 
         // Use ViewModel to add the new Habit
