@@ -1,12 +1,8 @@
 package com.rodrigo.madailytasks.collections
 
-import android.os.CountDownTimer
 import androidx.lifecycle.*
-import com.rodrigo.madailytasks.R
 import com.rodrigo.madailytasks.core.TasksRepository
-import com.rodrigo.madailytasks.dummy.MockTasks
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -15,29 +11,37 @@ import java.util.*
  */
 class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
 
+    override fun onCleared() {
+        super.onCleared()
+        refreshTaskList()
+    }
+
+    fun onResume() {
+        viewModelScope.launch {
+            refreshTaskList()
+        }
+    }
+
     /**
      * Mutable Live Data that initialize with the current list of saved Tasks.
      */
     private val uiState: MutableLiveData<UiState> by lazy {
-        MutableLiveData<UiState>(UiState(taskItemList = repository.fetchTasks()))
+        var list = emptyList<TaskItem>()
+
+        viewModelScope.launch {
+            repository.fetchTasks().collect {
+                list = it
+            }
+        }
+        MutableLiveData<UiState>(UiState(taskItemList = list))
     }
 
-    private val uiStateTimer: MutableLiveData<UiStateTimer> by lazy {
-        MutableLiveData<UiStateTimer>(
-            UiStateTimer(
-                currentTask = "",
-                timeLeftFormatted = "00:00:00",
-                timeInMs = 0L,
-                isRunning = false,
-            )
-        )
+    private val uiStateTime: MutableLiveData<UiStateTime> by lazy {
+
+        MutableLiveData<UiStateTime>(UiStateTime(currentTaskRunning = "00:00:00"))
     }
 
-    private lateinit var countdownTimer: CountDownTimer
-
-    fun stateOnceAndStreamTimer(): LiveData<UiStateTimer> {
-        return uiStateTimer
-    }
+    data class UiStateTime(val currentTaskRunning: String)
 
     /**
      * Expose the uiState as LiveData to UI.
@@ -57,82 +61,72 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
         subTask: String,
         tag: String,
         project: String,
-        time: TimeTask,
+        time: Long,
     ) {
         repository.addTask(task, subTask, tag, project, time)
         refreshTaskList()
     }
 
     private fun refreshTaskList() {
-        uiState.value?.let { currentUiState ->
-            uiState.value = currentUiState.copy(
-                taskItemList = repository.fetchTasks()
-            )
-        }
-    }
-
-    fun clickStartCountTimer(timeTask: String) {
-
         viewModelScope.launch {
-            uiStateTimer.value?.let { currentUiStateTimer ->
-                uiStateTimer.value = currentUiStateTimer.copy(
-                    timeLeftFormatted = timeTask
-                )
+            uiState.value?.let { currentUiState ->
+                repository.fetchTasks().collect {
+                    uiState.value = currentUiState.copy(
+                        taskItemList = it,
+                    )
+                }
             }
         }
+    }
+
+    fun timerTest(id: String, position: Int) {
+
+        viewModelScope.launch {
+            repository.timerTest(id, position)
+            refreshTaskList()
+        }
+
+        updateCurrentTimeTaskValue()
 
     }
 
-    fun isRunning(id:String) {
-        repository.toggleTaskIsRunning(id)
+
+    private fun countDownText(ms: Long): String {
+
+        val hour = (ms / 1000) / 3600
+        val minute = (ms / 1000 / 60) % 60
+        val seconds = (ms / 1000) % 60
+
+        return java.lang.String.format(
+            Locale.getDefault(),
+            "%02d:%02d:%02d",
+            hour,
+            minute,
+            seconds
+        )
     }
 
-//    fun getCountTimer(task: TaskItem) {
-//        if (task.isRunning) {
-//            pauseTimer(task)
-//        } else {
-//            startTimer(task)
-//        }
-//    }
-//
-//    private fun pauseTimer(task: TaskItem) : Int {
-//        CoroutineScope(Dispatchers.Default).launch {
-//            task.countDownTimer?.cancel()
-//            task.isRunning = false
-//        }
-//        return R.drawable.ic_play
-//    }
-//
-//    private fun startTimer(task: TaskItem) : Int {
-//
-//        task.countDownTimer = object : CountDownTimer(timeInMs, 1000) {
-//            override fun onFinish() {
-//                task.isRunning = false
-//            }
-//
-//            override fun onTick(p0: Long) {
-//                task.isRunning = true
-//                timeInMs = p0
-//                updateCountDownText()
-//            }
-//        }.start()
-//
-//        task.isRunning = true
-//
-//        return R.drawable.ic_pause
-//    }
+    private fun updateCurrentTimeTaskValue() {
 
-    /**
-     * UI State containing every data needed to show Tasks.
-     */
+        viewModelScope.launch {
+
+            uiStateTime.value?.let { currentUiState ->
+
+                repository.fetchTasks().collect {
+
+                    it.filter { item -> item.isRunning }.map { currentTaskRunningTime ->
+
+                        uiStateTime.value = currentUiState.copy(
+                            currentTaskRunning = countDownText(currentTaskRunningTime.timeTask),
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
     data class UiState(val taskItemList: List<TaskItem>)
-
-    data class UiStateTimer(
-        var currentTask: String,
-        var timeLeftFormatted: String?,
-        var timeInMs: Long,
-        val isRunning: Boolean = false,
-    )
 
     /**
      * ViewModel Factory needed to provide Repository injection to ViewModel.

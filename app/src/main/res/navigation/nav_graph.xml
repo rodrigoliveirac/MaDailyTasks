@@ -18,7 +18,7 @@
 
   <fragment
     android:id="@+id/taskFormFragment"
-    android:name="com.rodrigo.dailytasks.form.TaskFormFragment"
+    android:name="com.rodrigo.madailytasks.form.TaskFormFragment"
     android:label="@string/title_task_form" />
 
 </navigation>

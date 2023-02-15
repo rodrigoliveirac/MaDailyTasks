@@ -2,6 +2,7 @@ package com.rodrigo.madailytasks.collections
 
 import android.os.CountDownTimer
 import com.rodrigo.madailytasks.R
+import java.util.*
 
 /**
  * Task Model representing an Item in a ListView.
@@ -15,26 +16,11 @@ data class TaskItem(
     val subtask: String,
     val project: String,
     val tag: Tag,
-    val timeTask: TimeTask,
-    var countDownTimer: CountDownTimer? = null,
-    var isRunning: Boolean = false,
-    val isDone: Boolean  = false //TODO("to do review of logic structure")
-)
+    var timeTask: Long,
+    var isRunning: Boolean,
+    var timeLeft: Long,
 
-data class CurrentTask(
-    var taskId: TaskItem
 )
-
-data class TimeTask(
-    val hours: String,
-    val minutes: String,
-    val seconds: String,
-)
-
-enum class RunningState() {
-     PAUSED,
-     STARTED
-}
 
 enum class Tag(val tag: Int) {
 
@@ -42,6 +28,5 @@ enum class Tag(val tag: Int) {
     STUDY(R.drawable.ic_icon_book_circle),
     WORK(R.drawable.ic_icon_monitor_circle),
     CODE(R.drawable.ic_icon_code_circle)
-
 
 }
