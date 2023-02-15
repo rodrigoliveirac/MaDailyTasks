@@ -79,7 +79,7 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
         }
     }
 
-    fun timerTest(id: String, position: Int) {
+    fun playOrPauseTimer(id: String, position: Int) {
 
         viewModelScope.launch {
             repository.timerTest(id, position)

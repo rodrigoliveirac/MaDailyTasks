@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.rodrigo.madailytasks.R
+import com.rodrigo.madailytasks.R.*
 import com.rodrigo.madailytasks.databinding.TaskItemBinding
 import java.util.*
 
@@ -25,16 +26,10 @@ class TaskListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = TaskItemBinding.inflate(layoutInflater, parent, false)
-
         return ViewHolder(viewModel = viewModel, binding = binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        viewModel.stateOnceAndStream().observe(holder.itemView.context as LifecycleOwner) {
-//            val list = it.taskItemList
-//            val task = asyncListDiffer.currentList[position]
-//            holder.bind(list[position], position)
-//        }
         val task = asyncListDiffer.currentList[position]
         holder.bind(task, position)
     }
@@ -46,30 +41,43 @@ class TaskListAdapter(
     }
 
 
-    inner class ViewHolder(
+    class ViewHolder(
         private val binding: TaskItemBinding,
         private val viewModel: TaskListViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(task: TaskItem, position: Int) {
 
-            if (task.isRunning) {
-                binding.btnStart.setImageResource(R.drawable.ic_pause)
-            } else {
-                binding.btnStart.setImageResource(R.drawable.ic_play)
-            }
+            views(task)
 
-            binding.timeTextView.text = countDownText(task.timeTask)
+            onClickPlayButton(task, position)
+        }
+
+        private fun views(task: TaskItem) {
             binding.taskNameTextView.text = task.task
-            binding.tagNameTextView.text = task.tag.name
-            binding.imgTag.setImageResource(task.tag.tag)
+
             binding.projectNameTextView.text = task.project
 
+            binding.tagNameTextView.text = task.tag.name
+
+            binding.imgTag.setImageResource(task.tag.tag)
+
+            binding.btnStart.setImageResource(getValueAccordingTo(task.isRunning))
+
+            binding.timeTextView.text = countDownText(task.timeTask)
+
+        }
+
+        private fun onClickPlayButton(task: TaskItem, position: Int) {
             binding.btnStart.setOnClickListener {
 
-                viewModel.timerTest(task.id, position)
+                viewModel.playOrPauseTimer(task.id, position)
 
             }
+        }
+
+        private fun getValueAccordingTo(taskIsRunning: Boolean): Int {
+            return if (taskIsRunning) R.drawable.ic_play else drawable.ic_play
         }
 
         private fun countDownText(ms: Long): String {
