@@ -18,8 +18,7 @@ data class TaskItem(
     val tag: Tag,
     var timeTask: Long,
     var isRunning: Boolean,
-    var timeLeft: Long,
-
+    var isDone: Boolean,
 )
 
 enum class Tag(val tag: Int) {

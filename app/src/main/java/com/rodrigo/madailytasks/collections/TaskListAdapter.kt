@@ -62,7 +62,7 @@ class TaskListAdapter(
 
             binding.imgTag.setImageResource(task.tag.tag)
 
-            binding.btnStart.setImageResource(getValueAccordingTo(task.isRunning))
+            binding.btnStart.setImageResource(getValueAccordingTo(task))
 
             binding.timeTextView.text = countDownText(task.timeTask)
 
@@ -76,8 +76,13 @@ class TaskListAdapter(
             }
         }
 
-        private fun getValueAccordingTo(taskIsRunning: Boolean): Int {
-            return if (taskIsRunning) R.drawable.ic_pause else drawable.ic_play
+        private fun getValueAccordingTo(task: TaskItem): Int {
+            return if(task.isDone) {
+                R.drawable.baseline_done_24
+            } else {
+                if (task.isRunning) R.drawable.ic_pause else drawable.ic_play
+            }
+
         }
 
         private fun countDownText(ms: Long): String {

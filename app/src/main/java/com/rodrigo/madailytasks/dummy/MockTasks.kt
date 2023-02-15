@@ -43,7 +43,7 @@ object MockTasks : TasksRepository {
                 project = project,
                 timeTask = time,
                 isRunning = false,
-                timeLeft = 0L,
+                isDone = false,
             )
         )
         taskItemListFlow.value = taskItemList
@@ -113,7 +113,14 @@ object MockTasks : TasksRepository {
             }
 
             override fun onFinish() {
-                taskItemList[position] = task.copy(timeTask = 0L)
+                taskItemList = taskItemList.map {
+                    if (task.id == it.id) {
+                        it.copy(isDone = true, isRunning = false)
+                    } else {
+                        it.copy()
+                    }
+                } as MutableList<TaskItem>
+                taskItemListFlow.value = taskItemList
             }
         }
         runningTimers[position] = timer
