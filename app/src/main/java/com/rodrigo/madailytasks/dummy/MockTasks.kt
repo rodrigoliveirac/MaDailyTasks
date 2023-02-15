@@ -15,7 +15,8 @@ object MockTasks : TasksRepository {
 
     private var taskItemList: MutableList<TaskItem> = mutableListOf()
 
-    private var taskItemListFlow = MutableStateFlow(taskItemList.map { it.copy() })
+    private var taskItemListFlow = MutableStateFlow(getTasks())
+    private fun getTasks() = taskItemList.map { it.copy() }
 
 
     private val runningTimers = HashMap<Int, CountDownTimer>()
@@ -48,7 +49,7 @@ object MockTasks : TasksRepository {
         taskItemListFlow.value = taskItemList
     }
 
-    override fun timerTest(id: String, position: Int) {
+    override fun setupCurrentTimers(id: String, position: Int) {
 
         isRunningOrNot(id)
 

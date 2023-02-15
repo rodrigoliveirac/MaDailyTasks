@@ -63,7 +63,8 @@ class TaskListFragment : Fragment() {
 
     }
 
-    viewModel.currentTime().observe(viewLifecycleOwner) {
+    // Observer Value Time of Current Running Task
+    viewModel.stateOnceAndStreamCurrentTime().observe(viewLifecycleOwner) {
       binding.taskTimer.text = it.currentTaskRunning
     }
 

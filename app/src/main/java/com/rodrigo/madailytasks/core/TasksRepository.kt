@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface TasksRepository {
 
     suspend fun fetchTasks(): Flow<List<TaskItem>>
-    fun timerTest(id:String, position: Int)
+    fun setupCurrentTimers(id:String, position: Int)
     fun addTask(
         task: String,
         subTask: String,

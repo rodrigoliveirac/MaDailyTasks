@@ -14,19 +14,4 @@ class TaskListLifecycleObserver(
         viewModel.onResume()
     }
 
-    override fun onPause(owner: LifecycleOwner) {
-        super.onPause(owner)
-        viewModel.onResume()
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        viewModel.onResume()
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        viewModel.onResume()
-    }
-
 }

@@ -77,7 +77,7 @@ class TaskListAdapter(
         }
 
         private fun getValueAccordingTo(taskIsRunning: Boolean): Int {
-            return if (taskIsRunning) R.drawable.ic_play else drawable.ic_play
+            return if (taskIsRunning) R.drawable.ic_pause else drawable.ic_play
         }
 
         private fun countDownText(ms: Long): String {

@@ -11,11 +11,6 @@ import java.util.*
  */
 class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
 
-    override fun onCleared() {
-        super.onCleared()
-        refreshTaskList()
-    }
-
     fun onResume() {
         viewModelScope.launch {
             refreshTaskList()
@@ -26,6 +21,11 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
      * Mutable Live Data that initialize with the current list of saved Tasks.
      */
     private val uiState: MutableLiveData<UiState> by lazy {
+        val list = listCollectByFlowFromRepository()
+        MutableLiveData<UiState>(UiState(taskItemList = list))
+    }
+
+    private fun listCollectByFlowFromRepository(): List<TaskItem> {
         var list = emptyList<TaskItem>()
 
         viewModelScope.launch {
@@ -33,7 +33,8 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
                 list = it
             }
         }
-        MutableLiveData<UiState>(UiState(taskItemList = list))
+
+        return list
     }
 
     private val uiStateTime: MutableLiveData<UiStateTime> by lazy {
@@ -41,13 +42,15 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
         MutableLiveData<UiStateTime>(UiStateTime(currentTaskRunning = "00:00:00"))
     }
 
-    data class UiStateTime(val currentTaskRunning: String)
-
     /**
      * Expose the uiState as LiveData to UI.
      */
     fun stateOnceAndStream(): LiveData<UiState> {
         return uiState
+    }
+
+    fun stateOnceAndStreamCurrentTime(): LiveData<UiStateTime> {
+        return uiStateTime
     }
 
     /**
@@ -82,14 +85,13 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
     fun playOrPauseTimer(id: String, position: Int) {
 
         viewModelScope.launch {
-            repository.timerTest(id, position)
+            repository.setupCurrentTimers(id, position)
             refreshTaskList()
         }
 
         updateCurrentTimeTaskValue()
 
     }
-
 
     private fun countDownText(ms: Long): String {
 
@@ -127,6 +129,8 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
     }
 
     data class UiState(val taskItemList: List<TaskItem>)
+
+    data class UiStateTime(val currentTaskRunning: String)
 
     /**
      * ViewModel Factory needed to provide Repository injection to ViewModel.
