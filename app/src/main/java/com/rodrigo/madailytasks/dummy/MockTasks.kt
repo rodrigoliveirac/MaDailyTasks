@@ -49,7 +49,7 @@ object MockTasks : TasksRepository {
         taskItemListFlow.value = taskItemList
     }
 
-    override fun setupCurrentTimers(id: String, position: Int) {
+    override fun setupCurrentTimers(id: String) {
 
         isRunningOrNot(id)
 
@@ -58,9 +58,9 @@ object MockTasks : TasksRepository {
 
         runningTimers.values.forEach { it.cancel() }
 
-        val currentTimer = runningTimers[position]
+        val currentTimer = runningTimers[taskIndex]
 
-        setupTimer(currentTimer, position, task)
+        setupTimer(currentTimer, taskIndex, task)
 
     }
 
@@ -78,26 +78,23 @@ object MockTasks : TasksRepository {
 
     private fun setupTimer(
         currentTimer: CountDownTimer?,
-        position: Int,
+        taskIndex: Int,
         task: TaskItem,
     ) {
 
-        if (currentTimer != null && position == currentRunningTask) {
+        if (currentTimer != null && taskIndex == currentRunningTask) {
             if (currentRunningTask != -1) {
                 currentRunningTask = -1
                 currentTimer.cancel()
             }
         } else {
-            startTimer(task, position)
+            startTimer(task, taskIndex)
         }
     }
 
-    private fun startTimer(task: TaskItem, position: Int) {
+    private fun startTimer(task: TaskItem, taskIndex: Int) {
 
-        val index = findHabitIndexById(task.id)
-        val taskItem = taskItemList[index]
-
-        val timer = object : CountDownTimer(taskItem.timeTask, 1000) {
+        val timer = object : CountDownTimer(task.timeTask, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {
 
@@ -123,9 +120,9 @@ object MockTasks : TasksRepository {
                 taskItemListFlow.value = taskItemList
             }
         }
-        runningTimers[position] = timer
+        runningTimers[taskIndex] = timer
         timer.start()
-        currentRunningTask = position
+        currentRunningTask = taskIndex
     }
 
     private fun findHabitIndexById(id: String) = taskItemList.indexOfFirst { taskItem ->

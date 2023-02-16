@@ -2,6 +2,7 @@ package com.rodrigo.madailytasks.collections
 
 import androidx.lifecycle.*
 import com.rodrigo.madailytasks.core.TasksRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -66,8 +67,10 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
         project: String,
         time: Long,
     ) {
-        repository.addTask(task, subTask, tag, project, time)
-        refreshTaskList()
+        viewModelScope.launch {
+            repository.addTask(task, subTask, tag, project, time)
+            refreshTaskList()
+        }
     }
 
     private fun refreshTaskList() {
@@ -82,10 +85,10 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
         }
     }
 
-    fun playOrPauseTimer(id: String, position: Int) {
+    fun playOrPauseTimer(id: String) {
 
         viewModelScope.launch {
-            repository.setupCurrentTimers(id, position)
+            repository.setupCurrentTimers(id)
             refreshTaskList()
         }
 
