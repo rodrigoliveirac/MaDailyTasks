@@ -18,14 +18,12 @@ object MockTasks : TasksRepository {
     private var taskItemListFlow = MutableStateFlow(getTasks())
     private fun getTasks() = taskItemList.map { it.copy() }
 
-
     private val runningTimers = HashMap<Int, CountDownTimer>()
 
     private var currentRunningTask = -1
 
     override suspend fun fetchTasks(): Flow<List<TaskItem>> =
         taskItemListFlow
-
 
     override fun addTask(
         task: String,
@@ -34,22 +32,23 @@ object MockTasks : TasksRepository {
         project: String,
         time: Long
     ) {
-        taskItemList.add(
-            TaskItem(
-                id = UUID.randomUUID().toString(),
-                task = task,
-                subtask = subTask,
-                tag = Tag.valueOf(tag),
-                project = project,
-                timeTask = time,
-                isRunning = false,
-                isDone = false,
+            taskItemList.add(
+                TaskItem(
+                    id = UUID.randomUUID().toString(),
+                    task = task,
+                    subtask = subTask,
+                    tag = Tag.valueOf(tag),
+                    project = project,
+                    timeTask = time,
+                    isRunning = false,
+                    isDone = false,
+                )
             )
-        )
-        taskItemListFlow.value = taskItemList
+            taskItemListFlow.value = taskItemList
+
     }
 
-    override fun setupCurrentTimers(id: String) {
+    override  fun setupCurrentTimers(id: String) {
 
         isRunningOrNot(id)
 
@@ -76,7 +75,7 @@ object MockTasks : TasksRepository {
         taskItemListFlow.value = taskItemList
     }
 
-    private fun setupTimer(
+    private  fun setupTimer(
         currentTimer: CountDownTimer?,
         taskIndex: Int,
         task: TaskItem,
@@ -94,10 +93,12 @@ object MockTasks : TasksRepository {
 
     private fun startTimer(task: TaskItem, taskIndex: Int) {
 
+            setupTimer(task, taskIndex)
+    }
+
+    private fun setupTimer(task: TaskItem, taskIndex: Int) {
         val timer = object : CountDownTimer(task.timeTask, 1000) {
-
             override fun onTick(millisUntilFinished: Long) {
-
                 taskItemList = taskItemList.map {
                     if (task.id == it.id) {
                         it.copy(timeTask = millisUntilFinished)
@@ -105,6 +106,7 @@ object MockTasks : TasksRepository {
                         it.copy()
                     }
                 } as MutableList<TaskItem>
+
 
                 taskItemListFlow.value = taskItemList
             }
@@ -129,3 +131,5 @@ object MockTasks : TasksRepository {
         taskItem.id == id
     }
 }
+
+

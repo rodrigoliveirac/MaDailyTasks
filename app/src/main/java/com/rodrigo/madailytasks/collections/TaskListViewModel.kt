@@ -2,9 +2,11 @@ package com.rodrigo.madailytasks.collections
 
 import androidx.lifecycle.*
 import com.rodrigo.madailytasks.core.TasksRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -34,7 +36,6 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
                 list = it
             }
         }
-
         return list
     }
 
@@ -69,7 +70,6 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
     ) {
         viewModelScope.launch {
             repository.addTask(task, subTask, tag, project, time)
-            refreshTaskList()
         }
     }
 
@@ -89,7 +89,6 @@ class TaskListViewModel(private val repository: TasksRepository) : ViewModel() {
 
         viewModelScope.launch {
             repository.setupCurrentTimers(id)
-            refreshTaskList()
         }
 
         updateCurrentTimeTaskValue()

@@ -31,7 +31,7 @@ class TaskListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val task = asyncListDiffer.currentList[position]
-        holder.bind(task, position)
+        holder.bind(task)
     }
 
     override fun getItemCount(): Int = asyncListDiffer.currentList.size
@@ -46,11 +46,11 @@ class TaskListAdapter(
         private val viewModel: TaskListViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: TaskItem, position: Int) {
+        fun bind(task: TaskItem) {
 
             views(task)
 
-            onClickPlayButton(task, position)
+            onClickPlayButton(task)
         }
 
         private fun views(task: TaskItem) {
@@ -68,16 +68,16 @@ class TaskListAdapter(
 
         }
 
-        private fun onClickPlayButton(task: TaskItem, position: Int) {
+        private fun onClickPlayButton(task: TaskItem) {
             binding.btnStart.setOnClickListener {
 
-                viewModel.playOrPauseTimer(task.id, position)
+                viewModel.playOrPauseTimer(task.id)
 
             }
         }
 
         private fun getValueAccordingTo(task: TaskItem): Int {
-            return if(task.isDone) {
+            return if (task.isDone) {
                 R.drawable.baseline_done_24
             } else {
                 if (task.isRunning) R.drawable.ic_pause else drawable.ic_play

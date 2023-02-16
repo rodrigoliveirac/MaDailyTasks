@@ -39,7 +39,9 @@ class TaskFormFragment : Fragment() {
         setupDropdownMenuTags()
 
         // Save Habit and Navigate Up
-        binding.saveButton.setOnClickListener { onSave() }
+        binding.saveButton.setOnClickListener {
+            onSave()
+        }
     }
 
     private fun setupDropdownMenuTags() {
@@ -49,7 +51,7 @@ class TaskFormFragment : Fragment() {
         autoCompleteTextView.setAdapter(arrayAdapter)
     }
 
-    private fun onSave() {
+    private  fun onSave() {
         // Get value from the input to save
         val taskName = binding.taskNameTextInput.editText?.text.toString()
 
@@ -68,10 +70,11 @@ class TaskFormFragment : Fragment() {
 
 
         // Use ViewModel to add the new Habit
-        viewModel.addTask(taskName, subtaskName, tagName, projectName,timeTask)
+        viewModel.addTask(taskName, subtaskName, tagName, projectName, timeTask)
 
         // Navigate Up in the navigation three, meaning: goes back
         findNavController().navigateUp()
+
     }
 
     override fun onDestroyView() {
