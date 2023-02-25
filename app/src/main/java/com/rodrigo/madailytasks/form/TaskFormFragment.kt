@@ -9,9 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.rodrigo.madailytasks.R
-import com.rodrigo.madailytasks.collections.TaskListViewModel
+import com.rodrigo.madailytasks.core.repository.TaskRepositoryImpl
 import com.rodrigo.madailytasks.databinding.FragmentTaskFormBinding
-import com.rodrigo.madailytasks.dummy.MockTasks
 
 /**
  * A [Fragment] that displays a list of habits.
@@ -22,8 +21,8 @@ class TaskFormFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val viewModel: TaskListViewModel by activityViewModels {
-        TaskListViewModel.Factory(MockTasks)
+    private val viewModel: TaskFormViewModel by activityViewModels {
+        TaskFormViewModel.Factory(TaskRepositoryImpl)
     }
 
     override fun onCreateView(
