@@ -12,13 +12,11 @@ interface TimerRepository {
     /**
      * @param id ID of the current timer
      */
-    suspend fun delete(id: String)
-
-    suspend fun deleteOthers(id: String)
+    suspend fun setIfIsRunningOrNot(id: String)
 
     /**
      * @param taskId ID of the specific Task that current running
      */
-    suspend fun add(taskId: String)
+    suspend fun addAndStartRunning(taskId: String)
 
 }

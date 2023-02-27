@@ -8,7 +8,7 @@ object TaskRepositoryImpl : TaskRepository {
 
     private val taskListCache : MutableList<TaskDomain> = mutableListOf()
 
-    override suspend fun fetchAll() = taskListCache
+    override suspend fun fetchAll() = taskListCache.map { it.copy() }
 
     override suspend fun add(
         task: String,
